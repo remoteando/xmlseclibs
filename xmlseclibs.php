@@ -1177,7 +1177,7 @@ class XMLSecurityDSig {
         }
     }
 
-    static function staticAdd509Cert($parentRef, $cert, $isPEMFormat=TRUE, $isURL=False, $xpath=NULL, $options=NULL, $objKey=NULL) {
+    static function staticAdd509Cert($parentRef, $cert, $isPEMFormat=TRUE, $isURL=False, $xpath=NULL, $options=NULL, $privateKey=NULL) {
         if ($isURL) {
             $cert = file_get_contents($cert);
         }
@@ -1214,8 +1214,8 @@ class XMLSecurityDSig {
         $certs = XMLSecurityDSig::staticGet509XCerts($cert, $isPEMFormat);
 
 
-        if (!is_null($objKey)) {
-            $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private($objKey->key));
+        if (!is_null($privateKey)) {
+            $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private($privateKey));
             
             // Attach KeyValue node
             $keyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'KeyValue');
@@ -1296,9 +1296,9 @@ class XMLSecurityDSig {
         }
     }
 
-    public function add509Cert($cert, $isPEMFormat=TRUE, $isURL=False, $options=NULL, $objKey=NULL) {
+    public function add509Cert($cert, $isPEMFormat=TRUE, $isURL=False, $options=NULL, $privateKey=NULL) {
          if ($xpath = $this->getXPathObj()) {
-            self::staticAdd509Cert($this->sigNode, $cert, $isPEMFormat, $isURL, $xpath, $options, $objKey);
+            self::staticAdd509Cert($this->sigNode, $cert, $isPEMFormat, $isURL, $xpath, $options, $privateKey);
          }
     }
     
