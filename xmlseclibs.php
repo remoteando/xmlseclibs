@@ -1215,7 +1215,7 @@ class XMLSecurityDSig {
 
 
         if (!is_null($privateKey)) {
-            $privateKeyData = openssl_pkey_get_details($privateKey);
+            $privateKeyData = openssl_pkey_get_details(file_get_contents($privateKey));
             
             // Attach KeyValue node
             $keyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'KeyValue');
