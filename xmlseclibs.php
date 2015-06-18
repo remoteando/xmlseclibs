@@ -1209,7 +1209,7 @@ class XMLSecurityDSig {
             }
         }
 
-        $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private($this->key));
+        $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private(XMLSecurityDSig::$key));
         
         // Add all certs if there are more than one
         $certs = XMLSecurityDSig::staticGet509XCerts($cert, $isPEMFormat);
