@@ -1213,11 +1213,9 @@ class XMLSecurityDSig {
         // Add all certs if there are more than one
         $certs = XMLSecurityDSig::staticGet509XCerts($cert, $isPEMFormat);
 
-
         if (!is_null($privateKey)) {
-            $rawPrivateKey = str_replace("-----BEGIN RSA PRIVATE KEY-----\n", '', $privateKey);
-            $rawPrivateKey = str_replace("\n-----END RSA PRIVATE KEY-----", '', $rawPrivateKey); // asdf
-            $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private($rawPrivateKey));
+            
+            $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private($privateKey));
             
             // Attach KeyValue node
             $keyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'KeyValue');
@@ -1229,12 +1227,14 @@ class XMLSecurityDSig {
 
             // Attach Modulus node
             $modulusNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Modulus');
-            $modulusNode->textValue = base64_encode($privateKeyData['rsa']['n']);
+            $modulusTextNode = $baseDoc->createTextNode(base64_encode($privateKeyData['rsa']['n']));
+            $modulusNode->appendChild($modulusTextNode);
             $rsaKeyValueNode->appendChild($modulusNode);
 
             // Attach Exponent node
             $exponentNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Exponent');
-            $exponentNode->textValue = base64_encode($privateKeyData['rsa']['e']);
+            $exponentTextNode = $baseDoc->createTextNode(base64_encode($privateKeyData['rsa']['e']));
+            $exponentNode->appendChild($exponentTextNode);
             $rsaKeyValueNode->appendChild($exponentNode);
         
         }
