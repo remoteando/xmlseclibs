@@ -1084,6 +1084,7 @@ class XMLSecurityDSig {
             $this->appendSignature($appendToNode);
             $this->sigNode = $appendToNode->lastChild;
         }
+
         if ($xpath = $this->getXPathObj()) {
             $query = "./secdsig:SignedInfo";
             $nodeset = $xpath->query($query, $this->sigNode);
@@ -1176,7 +1177,7 @@ class XMLSecurityDSig {
         }
     }
 
-    static function staticAdd509Cert($parentRef, $cert, $isPEMFormat=TRUE, $isURL=False, $xpath=NULL, $options=NULL) {
+    static function staticAdd509Cert($parentRef, $cert, $isPEMFormat=TRUE, $isURL=False, $xpath=NULL, $options=NULL, $objKey=NULL) {
         if ($isURL) {
             $cert = file_get_contents($cert);
         }
@@ -1209,28 +1210,32 @@ class XMLSecurityDSig {
             }
         }
 
-        $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private(XMLSecurityDSig::$key));
-        
         // Add all certs if there are more than one
         $certs = XMLSecurityDSig::staticGet509XCerts($cert, $isPEMFormat);
 
-        // Attach KeyValue node
-        $keyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'KeyValue');
-        $keyInfo->appendChild($keyValueNode);
 
-        // Attach RSAKeyValue node
-        $rsaKeyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'RSAKeyValue');
-        $keyValueNode->appendChild($rsaKeyValueNode);
+        if (!is_null($objKey)) {
+            $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private(XMLSecurityDSig::$key));
+            
+            // Attach KeyValue node
+            $keyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'KeyValue');
+            $keyInfo->appendChild($keyValueNode);
 
-        // Attach Modulus node
-        $modulusNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Modulus');
-        $modulusNode->textValue = base64_encode($privateKeyData['rsa']['n']);
-        $rsaKeyValueNode->appendChild($modulusNode);
+            // Attach RSAKeyValue node
+            $rsaKeyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'RSAKeyValue');
+            $keyValueNode->appendChild($rsaKeyValueNode);
 
-        // Attach Exponent node
-        $exponentNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Exponent');
-        $exponentNode->textValue = base64_encode($privateKeyData['rsa']['e']);
-        $rsaKeyValueNode->appendChild($exponentNode);
+            // Attach Modulus node
+            $modulusNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Modulus');
+            $modulusNode->textValue = base64_encode($privateKeyData['rsa']['n']);
+            $rsaKeyValueNode->appendChild($modulusNode);
+
+            // Attach Exponent node
+            $exponentNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Exponent');
+            $exponentNode->textValue = base64_encode($privateKeyData['rsa']['e']);
+            $rsaKeyValueNode->appendChild($exponentNode);
+        
+        }
 
         // Attach X509 data node
         $x509DataNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'X509Data');
@@ -1291,9 +1296,9 @@ class XMLSecurityDSig {
         }
     }
 
-    public function add509Cert($cert, $isPEMFormat=TRUE, $isURL=False, $options=NULL) {
+    public function add509Cert($cert, $isPEMFormat=TRUE, $isURL=False, $options=NULL, $objKey=NULL) {
          if ($xpath = $this->getXPathObj()) {
-            self::staticAdd509Cert($this->sigNode, $cert, $isPEMFormat, $isURL, $xpath, $options);
+            self::staticAdd509Cert($this->sigNode, $cert, $isPEMFormat, $isURL, $xpath, $options, $objKey);
          }
     }
     
