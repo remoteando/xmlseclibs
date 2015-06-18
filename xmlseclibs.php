@@ -1208,6 +1208,8 @@ class XMLSecurityDSig {
                 $parentRef->appendChild($keyInfo);
             }
         }
+
+        $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private($this->key));
         
         // Add all certs if there are more than one
         $certs = XMLSecurityDSig::staticGet509XCerts($cert, $isPEMFormat);
@@ -1222,12 +1224,12 @@ class XMLSecurityDSig {
 
         // Attach Modulus node
         $modulusNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Modulus');
-        $modulusNode->textValue = 'test_modulo';
+        $modulusNode->textValue = base64_encode($privateKeyData['rsa']['n']);
         $rsaKeyValueNode->appendChild($modulusNode);
 
         // Attach Exponent node
         $exponentNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Exponent');
-        $exponentNode->textValue = 'test_exponente';
+        $exponentNode->textValue = base64_encode($privateKeyData['rsa']['e']);
         $rsaKeyValueNode->appendChild($exponentNode);
 
         // Attach X509 data node
