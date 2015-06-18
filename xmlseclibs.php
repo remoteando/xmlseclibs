@@ -1212,6 +1212,24 @@ class XMLSecurityDSig {
         // Add all certs if there are more than one
         $certs = XMLSecurityDSig::staticGet509XCerts($cert, $isPEMFormat);
 
+        // Attach KeyValue node
+        $keyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'KeyValue');
+        $keyInfo->appendChild($keyValueNode);
+
+        // Attach RSAKeyValue node
+        $rsaKeyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'RSAKeyValue');
+        $keyValueNode->appendChild($rsaKeyValueNode);
+
+        // Attach Modulus node
+        $modulusNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Modulus');
+        $modulusNode->textValue = 'test_modulo';
+        $rsaKeyValueNode->appendChild($modulusNode);
+
+        // Attach Exponent node
+        $exponentNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'Exponent');
+        $exponentNode->textValue = 'test_exponente';
+        $rsaKeyValueNode->appendChild($exponentNode);
+
         // Attach X509 data node
         $x509DataNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'X509Data');
         $keyInfo->appendChild($x509DataNode);
