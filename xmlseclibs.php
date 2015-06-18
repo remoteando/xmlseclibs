@@ -1217,7 +1217,7 @@ class XMLSecurityDSig {
         if (!is_null($privateKey)) {
             $rawPrivateKey = str_replace("-----BEGIN RSA PRIVATE KEY-----\n", '', $privateKey);
             $rawPrivateKey = str_replace("\n-----END RSA PRIVATE KEY-----", '', $rawPrivateKey); // asdf
-            $privateKeyData = openssl_pkey_get_details($rawPrivateKey);
+            $privateKeyData = openssl_pkey_get_details(openssl_pkey_get_private($rawPrivateKey));
             
             // Attach KeyValue node
             $keyValueNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'KeyValue');
